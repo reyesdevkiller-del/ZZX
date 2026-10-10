@@ -1,7 +1,7 @@
 
-plugins {
-    id("fabric-loom") version "1.15.5"
-    `maven-publish`
+    plugins {
+id("fabric-loom") version "1.15.5"
+"maven-publish"
 }
 
     
