@@ -1,41 +1,49 @@
 name: Build DarkPrime JAR
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main ]
+workflow_dispatch:
+push:
+branches: [main, master]
+
+permissions:
+contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
+runs-on: ubuntu-latest
 
-    defaults:
+defaults:
   run:
-    working-directory: .
-      
-      
+    working-directory: DarkPrime
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
+  - name: Set up Java 21
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '21'
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.6.0'
+  - name: Check project files
+    run: |
+      pwd
+      ls -la
+      test -f gradlew || test -f build.gradle || test -f build.gradle.kts
 
-      - name: Build DarkPrime
-        run: gradle build --no-daemon
+  - name: Build JAR
+    run: |
+      if [ -f gradlew ]; then
+        chmod +x gradlew
+        ./gradlew build --no-daemon
+      else
+        gradle build --no-daemon
+      fi
 
-      - name: Upload JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: DarkPrime-JAR
-          path: DarkPrime/build/libs/*.jar
-          if-no-files-found: error
+  - name: Upload JAR
+    uses: actions/upload-artifact@v4
+    with:
+      name: DarkPrime-JAR
+      path: DarkPrime/build/libs/*.jar
+      if-no-files-found: error
