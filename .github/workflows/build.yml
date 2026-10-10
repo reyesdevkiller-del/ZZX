@@ -1,6 +1,6 @@
 name: DarkPrime Build
 
-on:
+'on':
 workflow_dispatch:
 push:
 branches:
