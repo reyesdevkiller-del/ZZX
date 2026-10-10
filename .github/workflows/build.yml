@@ -1,17 +1,16 @@
 name: DarkPrime Build
 
 'on':
-workflow_dispatch:
+workflow_dispatch:  
 
 jobs:
-build:
-runs-on: ubuntu-latest
+build:  
+runs-on: ubuntu-latest.   
+steps:    
+- name: Checkout repository
+uses: actions/checkout@v4
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
-
-  - name: Install Java
+  - name: Install Java.     
     uses: actions/setup-java@v4
     with:
       distribution: temurin
