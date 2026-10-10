@@ -1,6 +1,6 @@
 name: Build DarkPrime JAR
 
-'on':
+on:
 workflow_dispatch:
 push:
 branches:
@@ -13,10 +13,9 @@ contents: read
 jobs:
 build:
 runs-on: ubuntu-latest
-
 steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+- name: Checkout repository
+uses: actions/checkout@v4
 
   - name: Set up Java 21
     uses: actions/setup-java@v4
@@ -27,33 +26,18 @@ steps:
   - name: Set up Gradle
     uses: gradle/actions/setup-gradle@v4
 
-  - name: Check Meteor Maven
-    shell: bash
+  - name: Build DarkPrime
     run: |
+      echo "Contenido del proyecto:"
+      ls -la
       for i in 1 2 3; do
-        if curl -fsSI --connect-timeout 15 \
-          https://maven.meteorclient.com/releases/; then
-          echo "Servidor Maven accesible"
+        if gradle build --no-daemon --refresh-dependencies; then
           exit 0
         fi
-        echo "Intento $i fallido; esperando..."
+        echo "Compilación fallida. Reintento $i..."
         sleep 5
       done
-      echo "No se pudo acceder al servidor Maven de Meteor."
       exit 1
-
-  - name: Build DarkPrime
-    shell: bash
-    run: |
-      echo "Archivos del proyecto:"
-      ls -la
-
-      if [ -f "./gradlew" ]; then
-        chmod +x ./gradlew
-        ./gradlew build --no-daemon --refresh-dependencies
-      else
-        gradle build --no-daemon --refresh-dependencies
-      fi
 
   - name: Upload JAR
     if: success()
