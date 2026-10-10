@@ -1,15 +1,10 @@
-name: Test DarkPrime
-'on': workflow_dispatch
-
+name: Test
+'on':
+workflow_dispatch:
 jobs:
 test:
 runs-on: ubuntu-latest
 steps:
-- name: Checkout
-uses: actions/checkout@v4
-
-  - name: List repository
-    run: ls -la
-
-  - name: Find Gradle files
-    run: find . -maxdepth 4 -name gradlew -print
+- uses: actions/checkout@v4
+- run: pwd
+- run: ls -la
