@@ -3,7 +3,9 @@ name: Build DarkPrime JAR
 on:
 workflow_dispatch:
 push:
-branches: [main, master]
+branches:
+- main
+- master
 
 permissions:
 contents: read
@@ -11,10 +13,6 @@ contents: read
 jobs:
 build:
 runs-on: ubuntu-latest
-
-defaults:
-  run:
-    working-directory: DarkPrime
 
 steps:
   - name: Checkout repository
@@ -26,20 +24,17 @@ steps:
       distribution: temurin
       java-version: '21'
 
-  - name: Check project files
+  - name: Check project folder
     run: |
       pwd
       ls -la
-      test -f gradlew || test -f build.gradle || test -f build.gradle.kts
+      ls -la DarkPrime
 
-  - name: Build JAR
+  - name: Build DarkPrime
+    working-directory: DarkPrime
     run: |
-      if [ -f gradlew ]; then
-        chmod +x gradlew
-        ./gradlew build --no-daemon
-      else
-        gradle build --no-daemon
-      fi
+      chmod +x gradlew
+      ./gradlew build --no-daemon
 
   - name: Upload JAR
     uses: actions/upload-artifact@v4
