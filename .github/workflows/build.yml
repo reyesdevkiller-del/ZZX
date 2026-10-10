@@ -4,7 +4,7 @@ name: DarkPrime Build
 workflow_dispatch:  
 push:  
 branches:    
-- main.     
+- main.      
 
 permissions:
 contents: read. 
