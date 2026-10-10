@@ -1,59 +1,64 @@
-
 name: Build DarkPrime JAR
 
 'on':
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-      - master
+workflow_dispatch:
+push:
+branches:
+- main
+- master
 
 permissions:
-  contents: read
+contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
+  - name: Set up Java 21
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '21'
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+  - name: Set up Gradle
+    uses: gradle/actions/setup-gradle@v4
 
-      - name: Build DarkPrime
-        shell: bash
-        run: |
-          echo "Contenido del repositorio:"
-          ls -la
+  - name: Check Meteor Maven
+    shell: bash
+    run: |
+      for i in 1 2 3; do
+        if curl -fsSI --connect-timeout 15 \
+          https://maven.meteorclient.com/releases/; then
+          echo "Servidor Maven accesible"
+          exit 0
+        fi
+        echo "Intento $i fallido; esperando..."
+        sleep 5
+      done
+      echo "No se pudo acceder al servidor Maven de Meteor."
+      exit 1
 
-          if [ -d "DarkPrime" ]; then
-            cd DarkPrime
-          fi
+  - name: Build DarkPrime
+    shell: bash
+    run: |
+      echo "Archivos del proyecto:"
+      ls -la
 
-          echo "Contenido del proyecto:"
-          ls -la
+      if [ -f "./gradlew" ]; then
+        chmod +x ./gradlew
+        ./gradlew build --no-daemon --refresh-dependencies
+      else
+        gradle build --no-daemon --refresh-dependencies
+      fi
 
-          if [ -f "./gradlew" ]; then
-            chmod +x ./gradlew
-            ./gradlew build --no-daemon
-          else
-            gradle build --no-daemon
-          fi
-
-      - name: Upload JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: DarkPrime-JAR
-          path: |
-            DarkPrime/build/libs/*.jar
-            build/libs/*.jar
-          if-no-files-found: error
-          
+  - name: Upload JAR
+    if: success()
+    uses: actions/upload-artifact@v4
+    with:
+      name: DarkPrime-JAR
+      path: build/libs/*.jar
+      if-no-files-found: error
